@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Парсер Endpoints</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let endpoints = [];
+
+        // функция для парсинга таблицы Endpoints
+        async function fetch_endpoints() {
+            const url = "https://toscrape.com/";
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, "text/html");
+                    const table = doc.querySelector("table.table.table-hover");
+                    const rows = table.querySelectorAll("tr:not(:first-child)"); // пропускаем заголовок "Endpoints"
+                    endpoints = Array.from(rows).map(row => {
+                        const linkElement = row.querySelector("a");
+                        return {
+                            name: linkElement.textContent.trim(),
+                            link: linkElement.href
+                        };
+                    });
+                    updatePage();
+                } else {
+                    endpoints = [{ name: "Ошибка", link: `Статус: ${response.status}` }];
+                }
+            } catch (e) {
+                endpoints = [{ name: "Ошибка парсинга", link: String(e) }];
+            }
+            updatePage();
+        }
+
+        function updatePage() {
+            const ul = document.getElementById('endpoints-list');
+            ul.innerHTML = '';
+            endpoints.forEach(endpoint => {
+                const li = document.createElement('li');
+                li.innerHTML = `'${endpoint.name}' ЭТО <a href='${endpoint.link}' target='_blank'>${endpoint.link}</a>`;
+                ul.appendChild(li);
+            });
+        }
+    </script>
+
+    <h1>Парсер Endpoints</h1>
+    <button onclick="fetch_endpoints()">Глянуть шо там</button>
+
+    <ul id="endpoints-list">
+    </ul>
+</body>
+</html>
+
