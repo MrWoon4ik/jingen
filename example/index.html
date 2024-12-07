@@ -32,7 +32,6 @@
     <script>
         let endpoints = [];
 
-        // функция для парсинга таблицы Endpoints
         async function fetch_endpoints() {
             const url = "https://toscrape.com/";
             try {
@@ -42,7 +41,7 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(text, "text/html");
                     const table = doc.querySelector("table.table.table-hover");
-                    const rows = table.querySelectorAll("tr:not(:first-child)"); // пропускаем заголовок "Endpoints"
+                    const rows = table.querySelectorAll("tr:not(:first-child)");
                     endpoints = Array.from(rows).map(row => {
                         const linkElement = row.querySelector("a");
                         return {
